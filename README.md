@@ -1,3 +1,7 @@
+# Hardware based on here:
+
+https://tiny-circuits.com/
+
 # Arduino should be running this code:
 https://codebender.cc/sketch:91073#TinyShield_NRF8001_BLE_Example.ino
 

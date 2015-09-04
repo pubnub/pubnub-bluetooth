@@ -39,6 +39,12 @@ var bluefruit = {
     rxCharacteristic: "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"  // receive is from the phone's perspective
 };
 
+
+var pubnub = PUBNUB.init({
+  publish_key: 'pub-2cc75d12-3c70-4599-babc-3e1d27fd1ad4',
+  subscribe_key: 'sub-cfb3b894-0a2a-11e0-a510-1d92d9e0ffba'
+});
+
 var app = {
     initialize: function() {
         this.bindEvents();
@@ -73,21 +79,36 @@ var app = {
         deviceList.appendChild(listItem);
     },
     connect: function(e) {
+
         var deviceId = e.target.dataset.deviceId,
-            onConnect = function() {
-                // subscribe for incoming data
-                ble.startNotification(deviceId, bluefruit.serviceUUID, bluefruit.rxCharacteristic, app.onData, app.onError);
-                sendButton.dataset.deviceId = deviceId;
-                disconnectButton.dataset.deviceId = deviceId;
-                app.showDetailPage();
-            };
+        onConnect = function() {
+            // subscribe for incoming data
+            ble.startNotification(deviceId, bluefruit.serviceUUID, bluefruit.rxCharacteristic, app.onData, app.onError);
+            sendButton.dataset.deviceId = deviceId;
+            disconnectButton.dataset.deviceId = deviceId;
+            app.showDetailPage();
+
+        };
 
         ble.connect(deviceId, onConnect, app.onError);
     },
     onData: function(data) { // data received from Arduino
-        console.log(data);
+
         resultDiv.innerHTML = resultDiv.innerHTML + "Received: " + bytesToString(data) + "<br/>";
         resultDiv.scrollTop = resultDiv.scrollHeight;
+
+        var data = bytesToString(data);
+        var vals = data.split(':');
+
+        pubnub.publish({
+          channel: 'pubnub-bluetooth-2',
+          message: {
+            'accelX': vals[0],
+            'accelY': vals[1],
+            'accelZ': vals[2] 
+          }
+        });
+
     },
     sendData: function(event) { // send data to Arduino
 
@@ -98,7 +119,7 @@ var app = {
         };
 
         var failure = function() {
-            alert("Failed writing data to the bluefruit le");
+            alert("Failed writing data to the bluetooth le");
         };
 
         var data = stringToBytes(messageInput.value);

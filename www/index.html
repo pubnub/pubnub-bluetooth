@@ -4,7 +4,6 @@
         <meta charset="utf-8" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1,  target-densitydpi=device-dpi" />
-        
         <link rel="stylesheet" type="text/css" href="css/index.css" />
         <title>BluefruitLE</title>
     </head>
@@ -17,18 +16,81 @@
                 <button id="refreshButton">Refresh</button>
             </div>
             <div id="detailPage">
-                <div id="resultDiv"></div>
                 <div>
-                    <input type="text" id="messageInput" value="Hello"/>
+                    <input type="text" id="messageInput" value="ping"/>
                     <button id="sendButton">Send</button>                    
                 </div>
+                <div id="chart"></div>
+                
+                <div id="resultDiv"></div>
                 <button id="disconnectButton">Disconnect</button>
             </div>            
         </div>
         <script type="text/javascript" src="cordova.js"></script>
+
+        <script type="text/javascript" src="http://pubnub.github.io/eon/lib/eon.js"></script>
+        <link type="text/css" rel="stylesheet" href="http://pubnub.github.io/eon/lib/eon.css" />
+
         <script type="text/javascript" src="js/index.js"></script>
+
         <script type="text/javascript">
             app.initialize();
+        </script>
+        <script type="text/javascript">
+        var __eon_pubnub = PUBNUB.init({
+          subscribe_key: "sub-cfb3b894-0a2a-11e0-a510-1d92d9e0ffba"
+        });
+        var __eon_cols = ["accelX","accelY","accelZ"]; 
+        var __eon_labels = {}; 
+        chart = eon.chart({
+          pubnub: __eon_pubnub,
+          channel: "pubnub-bluetooth-2",
+          history: true,
+          flow: true,
+          rate: 1000,
+          limit: 5,
+          generate: {
+            bindto: "#chart",
+            data: {
+              colors: {"accelX":"#D70060","accelY":"#E54028","accelZ":"#F18D05"},
+              type: "spline"
+            },
+            transition: {
+              duration: 250
+            },
+            axis: {
+              x: {
+                label: ""
+              },
+              y: {
+                label: ""
+              }
+            },
+            grid: {
+              x: {
+                show: false 
+              },
+              y: {
+                show: false 
+              }
+            },
+            tooltip: {
+             show: true
+            },
+            point: {
+              show: true
+            }
+          },
+          transform: function(message) {
+            var message = eon.c.flatten(message);
+            var array = __eon_cols.map(function(arg){
+              return [__eon_labels[arg] || arg, message[arg]];
+            });
+            return {
+              columns: array
+            };
+          }
+        });
         </script>
     </body>
 </html>

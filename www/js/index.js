@@ -45,30 +45,27 @@ var pubnub = PUBNUB.init({
   subscribe_key: 'sub-cfb3b894-0a2a-11e0-a510-1d92d9e0ffba'
 });
 
+var deviceId = false;
 var app = {
     initialize: function() {
-        this.bindEvents();
         detailPage.hidden = true;
-    },
-    bindEvents: function() {
-        document.addEventListener('deviceready', this.onDeviceReady, false);
-        refreshButton.addEventListener('touchstart', this.refreshDeviceList, false);
-        sendButton.addEventListener('click', this.sendData, false);
-        disconnectButton.addEventListener('touchstart', this.disconnect, false);
-        deviceList.addEventListener('touchstart', this.connect, false); // assume not scrolling
     },
     onDeviceReady: function() {
         app.refreshDeviceList();
     },
     refreshDeviceList: function() {
+        
         deviceList.innerHTML = ''; // empties the list
+
         if (cordova.platformId === 'android') { // Android filtering is broken
             ble.scan([], 5, app.onDiscoverDevice, app.onError);
         } else {
             ble.scan([bluefruit.serviceUUID], 5, app.onDiscoverDevice, app.onError);
         }
+
     },
     onDiscoverDevice: function(device) {
+
         var listItem = document.createElement('li'),
             html = '<b>' + device.name + '</b><br/>' +
                 'RSSI: ' + device.rssi + '&nbsp;|&nbsp;' +
@@ -77,20 +74,19 @@ var app = {
         listItem.dataset.deviceId = device.id;
         listItem.innerHTML = html;
         deviceList.appendChild(listItem);
+
+    },
+    onConnect: function() {
+        // subscribe for incoming data
+        ble.startNotification(deviceId, bluefruit.serviceUUID, bluefruit.rxCharacteristic, app.onData, app.onError);
+        sendButton.dataset.deviceId = deviceId;
+        disconnectButton.dataset.deviceId = deviceId;
+        app.showDetailPage();
+
     },
     connect: function(e) {
-
-        var deviceId = e.target.dataset.deviceId,
-        onConnect = function() {
-            // subscribe for incoming data
-            ble.startNotification(deviceId, bluefruit.serviceUUID, bluefruit.rxCharacteristic, app.onData, app.onError);
-            sendButton.dataset.deviceId = deviceId;
-            disconnectButton.dataset.deviceId = deviceId;
-            app.showDetailPage();
-
-        };
-
-        ble.connect(deviceId, onConnect, app.onError);
+        deviceId = e.target.dataset.deviceId,
+        ble.connect(deviceId, app.onConnect, app.onError);
     },
     onData: function(data) { // data received from Arduino
 
@@ -123,7 +119,7 @@ var app = {
         };
 
         var data = stringToBytes(messageInput.value);
-        var deviceId = event.target.dataset.deviceId;
+        deviceId = event.target.dataset.deviceId;
         ble.writeWithoutResponse(
             deviceId,
             bluefruit.serviceUUID,
@@ -133,7 +129,7 @@ var app = {
 
     },
     disconnect: function(event) {
-        var deviceId = event.target.dataset.deviceId;
+        deviceId = event.target.dataset.deviceId;
         ble.disconnect(deviceId, app.showMainPage, app.onError);
     },
     showMainPage: function() {
@@ -148,3 +144,11 @@ var app = {
         alert("ERROR: " + reason); // real apps should use notification.alert
     }
 };
+
+app.initialize();
+
+document.addEventListener('deviceready', app.onDeviceReady, false);
+refreshButton.addEventListener('touchstart', app.refreshDeviceList, false);
+sendButton.addEventListener('click', app.sendData, false);
+disconnectButton.addEventListener('touchstart', app.disconnect, false);
+deviceList.addEventListener('touchstart', app.connect, false); // assume not scrolling

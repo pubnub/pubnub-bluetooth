@@ -138,7 +138,7 @@ var app = {
         detailPage.hidden = false;
     },
     onError: function(reason) {
-        alert("ERROR: " + reason); // real apps should use notification.alert
+        console.log("ERROR: " + reason); // real apps should use notification.alert
     },
     startInterval: function() {
         interval = setInterval(function(){

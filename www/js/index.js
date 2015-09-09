@@ -78,7 +78,6 @@ var app = {
     },
     onConnect: function() {
         ble.startNotification(deviceId, config.serviceUUID, config.rxCharacteristic, app.onData, app.onError);
-        sendButton.dataset.deviceId = deviceId;
         disconnectButton.dataset.deviceId = deviceId;
         app.showDetailPage();
 
@@ -117,7 +116,6 @@ var app = {
         };
 
         var data = stringToBytes(messageInput.value);
-        deviceId = event.target.dataset.deviceId;
         ble.writeWithoutResponse(
             deviceId,
             config.serviceUUID,
@@ -127,7 +125,6 @@ var app = {
 
     },
     disconnect: function(event) {
-        deviceId = event.target.dataset.deviceId;
         ble.disconnect(deviceId, app.showMainPage, app.onError);
     },
     showMainPage: function() {

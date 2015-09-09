@@ -33,7 +33,7 @@ function stringToBytes(string) {
 }
 
 // this is Nordic's UART service
-var bluefruit = {
+var config = {
     serviceUUID: "6E400001-B5A3-F393-E0A9-E50E24DCCA9E",
     txCharacteristic: "6E400002-B5A3-F393-E0A9-E50E24DCCA9E", // transmit is from the phone's perspective
     rxCharacteristic: "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"  // receive is from the phone's perspective
@@ -60,7 +60,7 @@ var app = {
         if (cordova.platformId === 'android') { // Android filtering is broken
             ble.scan([], 5, app.onDiscoverDevice, app.onError);
         } else {
-            ble.scan([bluefruit.serviceUUID], 5, app.onDiscoverDevice, app.onError);
+            ble.scan([config.serviceUUID], 5, app.onDiscoverDevice, app.onError);
         }
 
     },
@@ -77,8 +77,7 @@ var app = {
 
     },
     onConnect: function() {
-        // subscribe for incoming data
-        ble.startNotification(deviceId, bluefruit.serviceUUID, bluefruit.rxCharacteristic, app.onData, app.onError);
+        ble.startNotification(deviceId, config.serviceUUID, config.rxCharacteristic, app.onData, app.onError);
         sendButton.dataset.deviceId = deviceId;
         disconnectButton.dataset.deviceId = deviceId;
         app.showDetailPage();
@@ -106,10 +105,9 @@ var app = {
         });
 
     },
-    sendData: function(event) { // send data to Arduino
+    sendData: function(event) {
 
         var success = function() {
-            console.log("success");
             resultDiv.innerHTML = resultDiv.innerHTML + "Sent: " + messageInput.value + "<br/>";
             resultDiv.scrollTop = resultDiv.scrollHeight;
         };
@@ -122,8 +120,8 @@ var app = {
         deviceId = event.target.dataset.deviceId;
         ble.writeWithoutResponse(
             deviceId,
-            bluefruit.serviceUUID,
-            bluefruit.txCharacteristic,
+            config.serviceUUID,
+            config.txCharacteristic,
             data, success, failure
         );
 

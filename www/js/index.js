@@ -46,6 +46,7 @@ var pubnub = PUBNUB.init({
 });
 
 var deviceId = false;
+var interval = false;
 var app = {
     initialize: function() {
         detailPage.hidden = true;
@@ -80,7 +81,7 @@ var app = {
         ble.startNotification(deviceId, config.serviceUUID, config.rxCharacteristic, app.onData, app.onError);
         disconnectButton.dataset.deviceId = deviceId;
         app.showDetailPage();
-
+        app.startInterval();
     },
     connect: function(e) {
         deviceId = e.target.dataset.deviceId,
@@ -104,10 +105,10 @@ var app = {
         });
 
     },
-    sendData: function(event) {
+    sendData: function(string) {
 
         var success = function() {
-            resultDiv.innerHTML = resultDiv.innerHTML + "Sent: " + messageInput.value + "<br/>";
+            resultDiv.innerHTML = resultDiv.innerHTML + "Sent: " + string + "<br/>";
             resultDiv.scrollTop = resultDiv.scrollHeight;
         };
 
@@ -115,7 +116,7 @@ var app = {
             alert("Failed writing data to the bluetooth le");
         };
 
-        var data = stringToBytes(messageInput.value);
+        var data = stringToBytes(string);
         ble.writeWithoutResponse(
             deviceId,
             config.serviceUUID,
@@ -126,6 +127,7 @@ var app = {
     },
     disconnect: function(event) {
         ble.disconnect(deviceId, app.showMainPage, app.onError);
+        app.clearInterval();
     },
     showMainPage: function() {
         mainPage.hidden = false;
@@ -137,6 +139,14 @@ var app = {
     },
     onError: function(reason) {
         alert("ERROR: " + reason); // real apps should use notification.alert
+    },
+    startInterval: function() {
+        interval = setInterval(function(){
+            app.sendData('ping!');
+        }, 500);
+    },
+    clearInterval: function() {
+        clearInterval(interval);
     }
 };
 
@@ -144,6 +154,8 @@ app.initialize();
 
 document.addEventListener('deviceready', app.onDeviceReady, false);
 refreshButton.addEventListener('touchstart', app.refreshDeviceList, false);
-sendButton.addEventListener('click', app.sendData, false);
+sendButton.addEventListener('click', function(){
+    app.sendData(messageInput.value);
+}, false);
 disconnectButton.addEventListener('touchstart', app.disconnect, false);
 deviceList.addEventListener('touchstart', app.connect, false); // assume not scrolling

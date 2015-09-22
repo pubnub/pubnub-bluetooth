@@ -74,6 +74,7 @@ var app = {
 
         listItem.dataset.deviceId = device.id;
         listItem.innerHTML = html;
+        listItem.className = "list-group-item";
         deviceList.appendChild(listItem);
 
     },
@@ -89,7 +90,7 @@ var app = {
     },
     onData: function(data) { // data received from Arduino
 
-        resultDiv.innerHTML = resultDiv.innerHTML + "Received: " + bytesToString(data) + "<br/>";
+        resultDiv.innerHTML = resultDiv.innerHTML + "<strong>Received:</strong> " + bytesToString(data) + "<br/>";
         resultDiv.scrollTop = resultDiv.scrollHeight;
 
         var data = bytesToString(data);
@@ -108,12 +109,12 @@ var app = {
     sendData: function(string) {
 
         var success = function() {
-            resultDiv.innerHTML = resultDiv.innerHTML + "Sent: " + string + "<br/>";
+            resultDiv.innerHTML = resultDiv.innerHTML + "<strong>Sent:</strong> " + string + "<br/>";
             resultDiv.scrollTop = resultDiv.scrollHeight;
         };
 
         var failure = function() {
-            alert("Failed writing data to the bluetooth le");
+            // console.log("Failed writing data to the bluetooth le");
         };
 
         var data = stringToBytes(string);
@@ -143,7 +144,7 @@ var app = {
     startInterval: function() {
         interval = setInterval(function(){
             app.sendData('ping!');
-        }, 500);
+        }, 1000);
     },
     clearInterval: function() {
         clearInterval(interval);

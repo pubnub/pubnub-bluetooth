@@ -41,6 +41,7 @@ var config = {
 
 
 var pubnub = PUBNUB.init({
+  ssl: true,
   publish_key: 'pub-2cc75d12-3c70-4599-babc-3e1d27fd1ad4',
   subscribe_key: 'sub-cfb3b894-0a2a-11e0-a510-1d92d9e0ffba'
 });

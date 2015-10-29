@@ -1,4 +1,4 @@
-# Getting started with Phonegap and Bluetooth
+# Build an internet connected Bluetooth wearable with Arduino and Phonegap
 
 Have you ever wanted to create your own Bluetooth app? Bluetooth is one of the most popular protocols for wireless communication between devices. Bluetooth powers a countless number of devices, from Bluetooth speakers, to smartwatches, headsets, fitness trackers, and more.
 
@@ -109,10 +109,6 @@ At the end of this short test, my Serial Console had the following log:
 
 ```
 Evt Device Started: Standby
-Advertising started
-Evt Connected
-Evt Pipe Status
-Evt Disconnected/Advertising timed out
 Advertising started
 Evt Connected
 Evt Pipe Status

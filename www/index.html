@@ -63,17 +63,16 @@
 
         <script type="text/javascript" src="cordova.js"></script>
 
-        <script type="text/javascript" src="http://pubnub.github.io/eon/lib/eon.js"></script>
-        <link type="text/css" rel="stylesheet" href="http://pubnub.github.io/eon/lib/eon.css" />
+        <script type="text/javascript" src="https://pubnub.github.io/eon/lib/eon.js"></script>
+        <link type="text/css" rel="stylesheet" href="https://pubnub.github.io/eon/lib/eon.css" />
 
         <script type="text/javascript" src="js/index.js"></script>
 
         <script type="text/javascript">
         var __eon_pubnub = PUBNUB.init({
-          subscribe_key: "sub-cfb3b894-0a2a-11e0-a510-1d92d9e0ffba"
+          subscribe_key: "sub-cfb3b894-0a2a-11e0-a510-1d92d9e0ffba",
+          ssl: true
         });
-        var __eon_cols = ["accelX","accelY","accelZ"]; 
-        var __eon_labels = {}; 
         chart = eon.chart({
           pubnub: __eon_pubnub,
           channel: "pubnub-bluetooth-2",
@@ -84,27 +83,10 @@
           generate: {
             bindto: "#chart",
             data: {
-              colors: {"accelX":"#D70060","accelY":"#E54028","accelZ":"#F18D05"},
               type: "spline"
             },
             transition: {
               duration: 0
-            },
-            axis: {
-              x: {
-                label: ""
-              },
-              y: {
-                label: ""
-              }
-            },
-            grid: {
-              x: {
-                show: false 
-              },
-              y: {
-                show: false 
-              }
             },
             tooltip: {
              show: true
